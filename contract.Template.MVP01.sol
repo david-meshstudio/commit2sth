@@ -20,7 +20,10 @@ contract MemberRegister
 	}
 	function Withdraw(bytes32 _oid, uint _amount) public
 	{
-		memberList[_oid].balance -= _amount;
+		if(memberList[_oid].balance >= _amount)
+		{
+			memberList[_oid].balance -= _amount;
+		}
 	}
 	function Record(bytes32 _oid, address _commit) public
 	{
@@ -29,40 +32,47 @@ contract MemberRegister
 }
 contract MVP01
 {
-	string public name;
-	uint public start;
-	uint public duration;
+	MemberRegister memberRegister;
+	bytes64 public name = "_Name_";
+	uint public start = _Start_;
+	uint public duration = _Duration_;
 	bytes32 public roleA = "_RoleA_";
 	bytes32 public roleC = "_RoleC_";
 	uint public aword = _Aword_;
 	uint public resultA = 0;
 	uint public result = 0;
-	MemberRegister memberRegister;
+	function Init(address addr) public
+	{
+		memberRegister = MemberRegister(addr);
+	}
 	function Fund() public
 	{
 		memberRegister.Withdraw(roleA, aword);
 	}
-	function Close(bytes32 caller, uint _result) public returns(string res)
+	function Close(bytes32 caller, uint judge) public returns(uint res)
 	{
 		if(now < start + duration * 1 days)
 		{
 			if(caller == roleC)
 			{
-				result = _result;
+				result = judge;
 				return Execute();
 			}
 			else
 			{
-				resultA = _result;
-				return "wait";
+				if(caller == roleA)
+				{
+					resultA = judge;
+					return 3;
+				}
 			}
 		}
 		else
 		{
-			return HasExpired();
+			return Execute();
 		}
 	}
-	function HasExpired() public returns(string res)
+	function HasExpired() public returns(uint res)
 	{
 		if(now >= start + duration * 1 days)
 		{
@@ -70,36 +80,36 @@ contract MVP01
 		}
 		else
 		{
-			return "not";
+			return 2;
 		}
 	}
-	function Execute() private returns(string res)
+	function Execute() private returns(uint res)
 	{
 		if(result == 1)
 		{
 			memberRegister.Deposite(roleA, aword);
-			return "ok";
+			return 1;
 		}
 		else
 		{
 			if(result == 2)
 			{
 				memberRegister.Deposite(roleC, aword);
-				return "ok";
+				return 1;
 			}
 			else
 			{
 				if(resultA == 1)
 				{
 					memberRegister.Deposite(roleA, aword);
-					return "ok";
+					return 1;
 				}
 				else
 				{
 					if(resultA == 2)
 					{
 						memberRegister.Deposite(roleC, aword);
-						return "ok";
+						return 1;
 					}
 					else
 					{
@@ -109,9 +119,9 @@ contract MVP01
 			}			
 		}
 	}
-	function Fail() private returns(string res)
+	function Fail() private returns(uint res)
 	{
 		memberRegister.Deposite(roleA, aword);
-		return "fail";
+		return 0;
 	}
 }
