@@ -1,5 +1,5 @@
 -module(test).
--export([try1/0, try2/0, try3/0, try4/0, try5/0, try6/0]).
+-export([try1/0, try2/0, try3/0, try4/0, try5/0, try6/0, try7/0]).
 -import(apilib,[call/2]).
 
 try1() ->
@@ -32,6 +32,9 @@ try5() ->
 
 try6() ->
 	apilib:eth_getTransactionReceipt("0x2a083e179dc75225361da2f86ced4a1178dabeb85859e8cb159626545c9b9839").
+
+try7() ->
+	crypto:hash(sha512,"bar(fixed128x128[2])").
 
 getLine(S, R) ->
 	case io:get_line(S, '') of

@@ -1,5 +1,5 @@
 -module(apilib).
--export([call/2,eth_getBalance/1,eth_getCompilers/0,eth_compileSolidity/1,eth_sendTransaction/4,eth_getTransactionReceipt/1]).
+-export([call/2,eth_getBalance/1,eth_getCompilers/0,eth_compileSolidity/1,eth_sendTransaction/4,eth_getTransactionReceipt/1,web3_sha3/1,padleft/2,get_methodCallData/2,get_methodSignHash/1,eth_methodCall/3,get_methodSign/2,eth_propertyCall/2,eth_propertyMappingCall/3,string2hexstring/1]).
 -import(rfc4627,[encode/1,decode/1]).
 
 call(Method, Params) ->
@@ -42,3 +42,104 @@ eth_sendTransaction(From, Gas, Value, Data) ->
 
 eth_getTransactionReceipt(Txid) ->
 	call("eth_getTransactionReceipt","[\""++Txid++"\"]").
+
+eth_propertyCall(To, Property) ->
+	Data = get_methodSignHash(Property++"()"),
+	{ok, {obj, [_, _, {_, Result}]}, _} = decode(call("eth_call","[{\"to\":\""++To++"\",\"data\":\""++Data++"\"}]")),
+	[_,_|RL] = binary_to_list(Result),
+	RL.
+
+eth_propertyMappingCall(To, Property, Params) ->
+	Data = get_methodSignHash(Property++"("++get_ParamsTypeString(Params)++")") ++ get_ParamsValueString(Params),
+	{ok, {obj, [_, _, {_, Result}]}, _} = decode(call("eth_call","[{\"to\":\""++To++"\",\"data\":\""++Data++"\"}]")),
+	[_,_|RL] = binary_to_list(Result),
+	RL.
+
+eth_methodCall(To, Method, Params) ->
+	Data = get_methodSignHash(Method++"("++get_ParamsTypeString(Params)++")") ++ get_ParamsValueString(Params),
+	{ok, {obj, [_, _, {_, Result}]}, _} = decode(call("eth_sendTransaction","[{\"from\":\"0x01E4Cb51Ec4768B9430b06A6EC2284C7977cCa48\",\"to\":\""++To++"\",\"data\":\""++Data++"\"}]")),
+	[_,_|RL] = binary_to_list(Result),
+	RL.
+
+get_methodCallData(Method, Params) ->
+	get_methodSignHash(get_methodSign(Method,Params)) ++ get_ParamsValueString(Params).
+
+get_methodSign(Method, Params) ->
+	Method++"("++get_ParamsTypeString(Params)++")".
+
+get_methodSignHash(Sign) ->
+	{ok, {obj, [_, _, {_, Result}]}, _} = decode(web3_sha3(Sign)),
+	[H1,H2,H3,H4,H5,H6,H7,H8,H9,H10|_] = binary_to_list(Result),
+	[H1,H2,H3,H4,H5,H6,H7,H8,H9,H10].
+
+get_ParamsTypeString([P|[]]) ->
+	case P of
+		{Type, _, _, _} ->
+			Type;
+		{} ->
+			""
+	end;
+get_ParamsTypeString([P|PL]) ->
+	case P of
+		{Type, _, _, _} ->
+			Type++","++get_ParamsTypeString(PL);
+		{} ->
+			""
+	end.
+
+get_ParamsValueString([P|PL]) ->
+	case P of
+		{Type, Value, Length, Offseet} ->
+			if
+				Type == "uint256" ->
+					padleft(de2Hex(Value), Length) ++ get_ParamsValueString(PL);
+				Type == "uint" ->
+					padleft(de2Hex(Value), Length) ++ get_ParamsValueString(PL);
+				Type == "bytes32" ->
+					padright(Value, Length) ++ get_ParamsValueString(PL);
+				Type == "string" ->
+					padleft(de2Hex(Offseet), 64) ++ padleft(de2Hex(length(Value)), 64) ++ padright(string2hexstring(Value), Length) ++ get_ParamsValueString(PL);					
+				true ->
+					padleft(Value, Length) ++ get_ParamsValueString(PL)
+			end;
+		{} ->
+			""
+	end;
+get_ParamsValueString([]) ->
+	"".
+
+web3_sha3(Content) ->
+	call("web3_sha3","[\"0x"++string2hexstring(Content)++"\"]").
+
+string2hexstring([H|T]) ->
+	integer_to_list(H,16)++string2hexstring(T);
+string2hexstring([]) ->
+	"".
+
+padleft(S, L) ->
+	if
+		length(S) < L ->
+			padleft("0"++S, L);
+		true ->
+			S
+	end.
+
+padright(S, L) ->
+	if
+		length(S) < L ->
+			padright(S++"0", L);
+		true ->
+			S
+	end.
+
+tempData([0])-> [];  
+tempData([Num]) ->
+    Temp = Num band 15,  
+    if  
+        Temp >= 0,Temp < 10 -> Result = Temp + 48;  
+        Temp >= 10,Temp < 16 ->  Result = Temp + 55          
+    end,  
+    [Result | tempData([Num bsr 4])].  
+ 
+de2Hex(Num)->  
+    lists:reverse(tempData([Num])).
