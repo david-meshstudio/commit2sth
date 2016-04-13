@@ -8,7 +8,7 @@ getBalance() ->
 	eth_getBalance("0x01E4Cb51Ec4768B9430b06A6EC2284C7977cCa48").
 
 getMember(Oid) ->
-	eth_propertyMappingCall(?CA, "memberList", [{"bytes32", Oid, 64, 0}]).
+	readMemberData(eth_propertyMappingCall(?CA, "memberList", [{"bytes32", Oid, 64, 0}])).
 
 register(Oid, Name) ->
 	eth_methodCall(?CA, "Register", [{"bytes32", Oid, 64, 0}, {"string", Name, 64, 64}]).
@@ -24,4 +24,5 @@ readMemberData(Data) ->
 	Balance = hex2de(lists:sublist(Data, 64 + 1, 64)),
 	NameLength = hex2de(lists:sublist(Data, 64 + Offset + 1, 64)),
 	Name = hexstring2string(lists:sublist(Data, 64 + Offset + 64 + 1, NameLength * 2)),
-	{Name, Balance}.
+	lists:flatten(io_lib:format("~s ~p",[Name, Balance])).
+	% encode({Name, Balance}).
