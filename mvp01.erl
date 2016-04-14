@@ -5,7 +5,7 @@
 -define(CA, "0x6B015e3c7D407977fa053e577F89A319667d3A21").
 
 getBalance() ->
-	eth_getBalance("0x01E4Cb51Ec4768B9430b06A6EC2284C7977cCa48").
+	eth_getBalance("0x31165e343da31363d8a0332c6638e4a55994ff1d").
 
 getMember(Params) ->
 	[Oid|_] = Params,
