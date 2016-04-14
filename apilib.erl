@@ -1,5 +1,5 @@
 -module(apilib).
--export([call/2,eth_getBalance/1,eth_getCompilers/0,eth_compileSolidity/1,eth_sendTransaction/4,eth_getTransactionReceipt/1,web3_sha3/1,padleft/2,get_methodCallData/2,get_methodSignHash/1,eth_methodCall/3,get_methodSign/2,eth_propertyCall/2,eth_propertyMappingCall/3,string2hexstring/1,hexstring2string/1,hex2de/1]).
+-export([call/2,eth_getBalance/1,eth_getCompilers/0,eth_compileSolidity/1,eth_sendTransaction/4,eth_getTransactionReceipt/1,web3_sha3/1,padleft/2,get_methodCallData/2,get_methodSignHash/1,eth_methodCall/3,get_methodSign/2,eth_propertyCall/2,eth_propertyMappingCall/3,string2hexstring/1,hexstring2string/1,hex2de/1,eth_blockNumber/0,get_tranBlockGap/1,hexstring2de/1]).
 -import(rfc4627,[encode/1,decode/1]).
 
 call(Method, Params) ->
@@ -42,6 +42,15 @@ eth_sendTransaction(From, Gas, Value, Data) ->
 
 eth_getTransactionReceipt(Txid) ->
 	call("eth_getTransactionReceipt","[\""++Txid++"\"]").
+
+eth_blockNumber() ->
+	{ok, {obj, [_, _, {_, Result}]}, _} = decode(call("eth_blockNumber","[\"\"]")),
+	Result.
+
+get_tranBlockGap(Txid) ->
+	{ok, {obj, [_, _, {_, Result}]}, _} = decode(eth_getTransactionReceipt(Txid)),
+	{obj, [_, _, {_, TBN}, _, _, _, _, _]} = Result,
+	hexstring2de(eth_blockNumber()) - hexstring2de(TBN).
 
 eth_propertyCall(To, Property) ->
 	Data = get_methodSignHash(Property++"()"),
@@ -152,3 +161,7 @@ de2Hex(Num)->
 
 hex2de(Hex) ->
 	list_to_integer(Hex,16).
+
+hexstring2de(Hex) ->
+	[_,_|L] = binary_to_list(Hex),
+	hex2de(L).
