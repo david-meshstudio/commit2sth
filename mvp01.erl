@@ -8,20 +8,20 @@ getBalance() ->
 	eth_getBalance("0x01E4Cb51Ec4768B9430b06A6EC2284C7977cCa48").
 
 getMember(Params) ->
-	[Oid|L] = Params,
-	readMemberData(eth_propertyMappingCall(?CA, "memberList", [{"bytes32", Oid, 64, 0}])).
+	[Oid|_] = Params,
+	readMemberData(eth_propertyMappingCall(?CA, "memberList", [{"bytes32", binary_to_list(Oid), 64, 0}])).
 
 register(Params) ->
-	[Oid, Amount|L] = Params,
-	eth_methodCall(?CA, "Register", [{"bytes32", Oid, 64, 0}, {"string", Name, 64, 64}]).
+	[Oid, Name|_] = Params,
+	eth_methodCall(?CA, "Register", [{"bytes32", binary_to_list(Oid), 64, 0}, {"string", binary_to_list(Name), 64, 64}]).
 
 deposite(Params) ->
-	[Oid, Amount|L] = Params,
-	eth_methodCall(?CA, "Deposite", [{"bytes32", Oid, 64, 0}, {"uint256", Amount, 64, 0}]).
+	[Oid, Amount|_] = Params,
+	eth_methodCall(?CA, "Deposite", [{"bytes32", binary_to_list(Oid), 64, 0}, {"uint256", Amount, 64, 0}]).
 
 withdraw(Params) ->
-	[Oid, Amount|L] = Params,
-	eth_methodCall(?CA, "Withdraw", [{"bytes32", Oid, 64, 0}, {"uint256", Amount, 64, 0}]).
+	[Oid, Amount|_] = Params,
+	eth_methodCall(?CA, "Withdraw", [{"bytes32", binary_to_list(Oid), 64, 0}, {"uint256", Amount, 64, 0}]).
 
 readMemberData(Data) ->
 	Offset = hex2de(lists:sublist(Data, 1, 64)),
