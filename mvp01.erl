@@ -5,7 +5,8 @@
 -define(CA, "0x6B015e3c7D407977fa053e577F89A319667d3A21").
 
 getBalance() ->
-	eth_getBalance("0x31165e343da31363d8a0332c6638e4a55994ff1d").
+	[_,_|L] = binary_to_list(eth_getBalance("0x31165e343da31363d8a0332c6638e4a55994ff1d")),
+	hex2de(L).
 
 getMember(Params) ->
 	[Oid|_] = Params,
@@ -28,5 +29,5 @@ readMemberData(Data) ->
 	Balance = hex2de(lists:sublist(Data, 64 + 1, 64)),
 	NameLength = hex2de(lists:sublist(Data, 64 + Offset + 1, 64)),
 	Name = hexstring2string(lists:sublist(Data, 64 + Offset + 64 + 1, NameLength * 2)),
-	lists:flatten(io_lib:format("~s ~p",[Name, Balance])).
+	lists:flatten(io_lib:format("~s|||~p",[Name, Balance])).
 	% encode({Name, Balance}).
