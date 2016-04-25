@@ -6,7 +6,7 @@
 
 register(Params) ->
 	[SN, Content|_] = Params,
-	eth_methodCall(?CA, "Register", [{"bytes32", binary_to_list(SN), 64, 0}, {"string", binary_to_list(Content), 64, 64}]).
+	eth_methodCall(?CA, "Register", [{"bytes32", binary_to_list(SN), 64, 0}, {"string", binary_to_list(unicode:characters_to_binary(Content)), 64, 64}]).
 
 verify(Params) ->
 	[SN|_] = Params,
@@ -15,7 +15,8 @@ verify(Params) ->
 readContent(Data) ->
 	Offset = hex2de(lists:sublist(Data, 1, 64)) * 2,
 	ContentLength = hex2de(lists:sublist(Data, Offset + 1, 64)),
-	Content = hexstring2string(lists:sublist(Data, Offset + 64 + 1, ContentLength * 2)),
+	% Content = hexstring2string(lists:sublist(Data, Offset + 64 + 1, ContentLength * 2)),
+	Content = unicode:characters_to_binary(lists:sublist(Data, Offset + 64 + 1, ContentLength * 2)),
 	% lists:flatten(io_lib:format("~s",Content)).
 	% {Data,lists:sublist(Data, Offset + 1, 64), Offset, ContentLength, Content}.
-	Content.
+	Data
