@@ -19,4 +19,4 @@ readContent(Data) ->
 	Content = unicode:characters_to_binary(lists:sublist(Data, Offset + 64 + 1, ContentLength * 2)),
 	% lists:flatten(io_lib:format("~s",Content)).
 	% {Data,lists:sublist(Data, Offset + 1, 64), Offset, ContentLength, Content}.
-	Data
+	Content.
