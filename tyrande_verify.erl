@@ -10,11 +10,10 @@ register(Params) ->
 
 verify(Params) ->
 	[SN|_] = Params,
-	readMemberData(eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}])).
+	readContent(eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}])).
 
-readMemberData(Data) ->
+readContent(Data) ->
 	Offset = hex2de(lists:sublist(Data, 1, 64)),
-	Balance = hex2de(lists:sublist(Data, 64 + 1, 64)),
-	NameLength = hex2de(lists:sublist(Data, 64 + Offset + 1, 64)),
-	Name = hexstring2string(lists:sublist(Data, 64 + Offset + 64 + 1, NameLength * 2)),
-	lists:flatten(io_lib:format("~s|||~p",[Name, Balance])).
+	ContentDataLength = hex2de(lists:sublist(Data, Offset + 1, 64)),
+	Content = hexstring2string(lists:sublist(Data, Offset + 64 + 1, ContentDataLength * 2)),
+	lists:flatten(io_lib:format("~s",Content)).
