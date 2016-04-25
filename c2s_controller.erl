@@ -21,6 +21,10 @@ do(SessionID, _Env, Input) ->
 			Content = withdraw(Params);
 		"tranBlockGap" ->
 			Content = getTranBlockGap(Params);
+		"tyrande_register" ->
+			Content = tyrande_verify:register(Params);
+		"tyrande_verify" ->
+			Content = tyrande_verify:verify(Params);
 		_ ->
 			Content = "No such query."
 	end,
