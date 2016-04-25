@@ -13,7 +13,9 @@ verify(Params) ->
 	readContent(eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}])).
 
 readContent(Data) ->
-	Offset = hex2de(lists:sublist(Data, 1, 64)),
-	ContentDataLength = hex2de(lists:sublist(Data, Offset + 1, 64)),
-	Content = hexstring2string(lists:sublist(Data, Offset + 64 + 1, ContentDataLength * 2)),
-	lists:flatten(io_lib:format("~s",Content)).
+	Offset = hex2de(lists:sublist(Data, 1, 64)) * 2,
+	ContentLength = hex2de(lists:sublist(Data, Offset + 1, 64)),
+	Content = hexstring2string(lists:sublist(Data, Offset + 64 + 1, ContentLength * 2)),
+	% lists:flatten(io_lib:format("~s",Content)).
+	% {Data,lists:sublist(Data, Offset + 1, 64), Offset, ContentLength, Content}.
+	Content.
