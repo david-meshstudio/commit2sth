@@ -101,14 +101,14 @@ get_ParamsValueString([P|PL]) ->
 	case P of
 		{Type, Value, Length, Offset} ->
 			if
-				Type == "uint256" ->
+				Type =:= "uint256" ->
 					padleft(de2Hex(Value), Length) ++ get_ParamsValueString(PL);
-				Type == "uint" ->
+				Type =:= "uint" ->
 					padleft(de2Hex(Value), Length) ++ get_ParamsValueString(PL);
-				Type == "bytes32" ->
+				Type =:= "bytes32" ->
 					padright(Value, Length) ++ get_ParamsValueString(PL);
-				Type == "string" ->
-					padleft(de2Hex(Offset), 64) ++ padleft(de2Hex(length(Value)), 64) ++ padright(string2hexstring(Value), Length) ++ get_ParamsValueString(PL);					
+				Type =:= "string" ->
+					padleft(de2Hex(Offset), 64) ++ padleft(de2Hex(length(Value)), 64) ++ padright(string2hexstring(Value), Length) ++ get_ParamsValueString(PL);
 				true ->
 					padleft(Value, Length) ++ get_ParamsValueString(PL)
 			end;

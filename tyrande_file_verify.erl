@@ -6,7 +6,10 @@
 
 register(Params) ->
 	[SN, Content, Timestamp|_] = Params,
-	eth_methodCall(?CA, "Register", [{"bytes32", binary_to_list(SN), 64, 0}, {"bytes32", binary_to_list(Content), 64, 0}, {"uint256", Timestamp, 64, 0}]).
+	case eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}]) of
+		[_, TS] when TS =:= 0 ->
+			eth_methodCall(?CA, "Register", [{"bytes32", binary_to_list(SN), 64, 0}, {"bytes32", binary_to_list(Content), 64, 0}, {"uint256", Timestamp, 64, 0}])
+	end.
 
 verify(Params) ->
 	[SN|_] = Params,
