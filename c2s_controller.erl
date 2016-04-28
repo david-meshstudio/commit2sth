@@ -25,6 +25,10 @@ do(SessionID, _Env, Input) ->
 			Content = tyrande_verify:register(Params);
 		"tyrande_verify" ->
 			Content = tyrande_verify:verify(Params);
+		"tyrande_file_register" ->
+			Content = tyrande_file_verify:register(Params);
+		"tyrande_file_verify" ->
+			Content = tyrande_file_verify:verify(Params);
 		_ ->
 			Content = "No such query."
 	end,

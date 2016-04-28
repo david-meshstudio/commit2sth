@@ -6,11 +6,12 @@
 
 register(Params) ->
 	[SN, Content, Timestamp|_] = Params,
-	eth_methodCall(?CA, "Register", [{"bytes32", binary_to_list(SN), 64, 0}, {"bytes32", binary_to_list(Content), 64, 0}, {"uint", Timestamp, 64, 0}]).
+	eth_methodCall(?CA, "Register", [{"bytes32", binary_to_list(SN), 64, 0}, {"bytes32", binary_to_list(Content), 64, 0}, {"uint256", Timestamp, 64, 0}]).
 
 verify(Params) ->
 	[SN|_] = Params,
-	readContent(eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}])).
+	% readContent(eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}])).
+	eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}]).
 
 readContent(Data) ->
 	Content = list_to_binary(lists:sublist(Data, 1, 64)),
