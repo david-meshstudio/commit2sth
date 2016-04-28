@@ -10,8 +10,8 @@ register(Params) ->
 
 verify(Params) ->
 	[SN|_] = Params,
-	% readContent(eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}])).
-	eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}]).
+	readContent(eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}])).
+	% eth_propertyMappingCall(?CA, "productList", [{"bytes32", binary_to_list(SN), 64, 0}]).
 
 readContent(Data) ->
 	Content = list_to_binary(lists:sublist(Data, 1, 64)),
