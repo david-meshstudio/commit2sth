@@ -9,7 +9,7 @@ do(SessionID, _Env, Input) ->
 	Header = ["Content-Type: text/plain; charset=utf-8\r\n\r\n"],
 	{ok, {obj, [{_, Command}, {_, Params}]}, []} = Data,
 	case binary_to_list(Command) of
-		"getBalance" when Params =:= "" ->
+		"getBalance" when Params =:= <<>> ->
 			Content = encode(getBalance());
 		"getBalance" ->
 			Content = encode(getBalance(binary_to_list(Params)));
